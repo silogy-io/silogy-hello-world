@@ -1,0 +1,3 @@
+- name: Test Tracing
+  command: "make"
+  time_limit: 600
