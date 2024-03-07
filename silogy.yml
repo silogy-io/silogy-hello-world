@@ -7,5 +7,5 @@ test_rules:
     command_string: make
 test_targets:
   test_tracing:
-    test_rule: test_tracing_rule
     time_limit: 600
+    test_rule: test_tracing_rule
