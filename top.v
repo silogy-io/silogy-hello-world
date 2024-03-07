@@ -1,46 +1,64 @@
-// DESCRIPTION: Verilator: Verilog example module
+// A little vga module James wrote in 2019. That was 5 years ago!
 //
-// This file ONLY is placed under the Creative Commons Public Domain, for
-// any use, without warranty, 2003 by Wilson Snyder.
-// SPDX-License-Identifier: CC0-1.0
-// ======================================================================
-
-// This is intended to be a complex example of several features, please also
-// see the simpler examples/make_hello_c.
+// 
+// 
 
 module top
   (
    // Declare some signals so we can see how I/O works
-   input              clk,
-   input              reset_l,
-
-   output wire [1:0]  out_small,
-   output wire [39:0] out_quad,
-   output wire [69:0] out_wide,
-   input [1:0]        in_small,
-   input [39:0]       in_quad,
-   input [69:0]       in_wide
+   input i_clk,
+   input i_reset_n, 
+   //inputs ... 
+   input  [9:0] i_vga_r,               
+   input  [9:0] i_vga_g,
+   input  [9:0] i_vga_b,
+   //outputs ...  
+   output reg [9:0] o_vga_r_DAC,
+   output reg [9:0] o_vga_g_DAC,
+   output reg [9:0] o_vga_b_DAC,
+   output wire  [9:0] o_x_addr,
+   output wire  [9:0] o_y_addr
    );
+   /* verilator lint_off UNUSEDSIGNAL */
+  wire vga_hs, vga_vs, vga_blank;
+  // And an example sub module. The submodule will print stuff.
+  vga vga (/*AUTOINST*/
+           // Inputs
+           .clock                        (i_clk),
+           .reset_n                      (i_reset_n),
+           .vga_r                        (i_vga_r),
+           .vga_g                        (i_vga_g),
+           .vga_b                        (i_vga_b),
+           .vga_r_DAC                    (o_vga_r_DAC),
+           .vga_g_DAC                    (o_vga_g_DAC),
+           .vga_b_DAC                    (o_vga_b_DAC),
+           .x_addr                       (o_x_addr),
+           .y_addr                       (o_y_addr),
+           .vga_hs                       (vga_hs),
+           .vga_vs                       (vga_vs),
+           .vga_blank                    (vga_blank)
 
-   // Connect up the outputs, using some trivial logic
-   assign out_small = ~reset_l ? '0 : (in_small + 2'b1);
-   assign out_quad  = ~reset_l ? '0 : (in_quad + 40'b1);
-   assign out_wide  = ~reset_l ? '0 : (in_wide + 70'b1);
+         );
 
-   // And an example sub module. The submodule will print stuff.
-   sub sub (/*AUTOINST*/
-            // Inputs
-            .clk                        (clk),
-            .reset_l                    (reset_l));
+  // Print some stuff as an example
+  initial begin
+     if ($test$plusargs("trace") != 0) begin
+        $display("[%0t] Tracing to logs/vga_dump.vcd...\n", $time);
+        $dumpfile("logs/vga_dump.vcd");
+        $dumpvars();
+     end
+     $display("[%0t] VGA model running...\n", $time);
+  end
 
-   // Print some stuff as an example
-   initial begin
-      if ($test$plusargs("trace") != 0) begin
-         $display("[%0t] Tracing to logs/vlt_dump.vcd...\n", $time);
-         $dumpfile("logs/vlt_dump.vcd");
-         $dumpvars();
-      end
-      $display("[%0t] Model running...\n", $time);
+  always_ff @ (posedge i_clk) begin
+         if (o_y_addr == 480) begin
+            // Lets just render one page
+            $finish;
+         end
    end
+
+
+
+
 
 endmodule

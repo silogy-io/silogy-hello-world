@@ -3,9 +3,23 @@
 # A pipeline specifies which jobs ( = groups of tests) should be run at a certain time.
 version: 0
 test_rules:
-  test_tracing_rule:
-    command_string: test_default.sh
+  vga_test_rule:
+    command_string: >
+      test_vga.sh --
+      --seed={{ args['seed'] }}
 test_targets:
-  test_tracing:
+  vga_test_default:
+    test_rule: vga_test_rule
     time_limit: 600
-    test_rule: test_tracing_rule
+    args:
+      seed: 400
+  vga_test_seed_400:
+    test_rule: vga_test_rule
+    time_limit: 600
+    args:
+      seed: 400
+  vga_test_seed_34510:
+    test_rule: vga_test_rule
+    time_limit: 600
+    args:
+      seed: 34510
