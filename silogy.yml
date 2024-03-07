@@ -4,7 +4,7 @@
 version: 0
 test_rules:
   test_tracing_rule:
-    command_string: test_default.sh
+    command_string: ./test_default.sh
 test_targets:
   test_tracing:
     time_limit: 600
