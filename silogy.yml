@@ -1,3 +1,11 @@
-- name: Test Tracing
-  command: "make"
-  time_limit: 600
+# A test is the lowest level. It is intended to test a specific piece of functionality.
+# A job is a grouping of tests based on those that should be run together.
+# A pipeline specifies which jobs ( = groups of tests) should be run at a certain time.
+version: 0
+test_rules:
+  test_tracing_rule:
+    command_string: make
+test_targets:
+  test_tracing:
+    test_rule: test_tracing_rule
+    time_limit: 600
