@@ -12,6 +12,8 @@ Get started
 2. Install our [app](https://github.com/apps/silogy-design-verification-runner) on your account, enabled for just the
    new cloned repo.
 3. Click "Run" on the homepage or push to your cloned repo to kick off a test.
+4. To modify the compilation steps that are run pre-test, click on the repo name -> "See base definitions" -> "Example
+   base definition" -> modify the pre-clone or post-clone Dockerfile steps.
 
 Test definitions
 ---
