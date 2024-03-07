@@ -5,7 +5,7 @@ version: 0
 test_rules:
   vga_test_rule:
     command_string: >
-      test_vga.sh --
+      ./test_vga.sh --
       --seed={{ args['seed'] }}
 test_targets:
   vga_test_default:
