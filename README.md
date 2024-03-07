@@ -1,6 +1,8 @@
 SiLogy example repository
 ===
 
+![SiLogy collage](static/collage.png)
+
 SiLogy is a cloud tool for chip design and verification. We provide a platform for design verification engineers to
 orchestrate test runs, get test results, and collaborate with colleagues. This repository is intended to show you some
 things you can do with SiLogy. 
