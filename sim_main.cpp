@@ -37,9 +37,9 @@ void reset(const std::unique_ptr<Vtop> &tb,
   tb->i_reset_n = 1;
 }
 
-inline void sendByte(const std::unique_ptr<Vtop> &tb,
-                     const std::unique_ptr<VerilatedContext> &contextp,
-                     uint8_t byte) {
+inline uint8_t sendByte(const std::unique_ptr<Vtop> &tb,
+                        const std::unique_ptr<VerilatedContext> &contextp,
+                        uint8_t byte) {
 
   VL_PRINTF("[%" PRId64 "] sending byte %x \n", contextp->time(), byte);
   tb->i_TX_Byte = byte;
@@ -52,6 +52,7 @@ inline void sendByte(const std::unique_ptr<Vtop> &tb,
   auto received_byte = tb->o_RX_Byte;
   VL_PRINTF("[%" PRId64 "] received byte %x \n", contextp->time(),
             received_byte);
+  return received_byte;
 }
 
 int main(int argc, char **argv) {
@@ -142,7 +143,11 @@ int main(int argc, char **argv) {
   reset(top, contextp);
   auto prev_cycle_y = 0;
   for (int j = 0; j < payload; j++) {
-    sendByte(top, contextp, datastream[j]);
+    uint8_t received_byte = sendByte(top, contextp, datastream[j]);
+    if (received_byte != datastream[j]) {
+      VL_PRINTF("Error: sent byte %x, received %x\n", datastream[j], received_byte);
+      return 1;
+    }
   }
 
   // Final model cleanup
