@@ -11,16 +11,11 @@
 // Include common routines
 #include <getopt.h>
 #include <random>
+#include <vector>
 #include <verilated.h>
 
 // Include model header, generated from Verilating "top.v"
 #include "Vtop.h"
-
-struct color_t {
-  uint16_t red;
-  uint64_t green;
-  uint16_t blue;
-};
 
 // Legacy function required only so linking works on Cygwin and MSVC++
 double sc_time_stamp() { return 0; }
@@ -29,10 +24,10 @@ inline void tick(const std::unique_ptr<Vtop> &tb,
                  const std::unique_ptr<VerilatedContext> &contextp) {
   tb->i_clk = 0;
   tb->eval();
-  contextp->timeInc(5);
+  contextp->timeInc(1);
   tb->i_clk = 1;
   tb->eval();
-  contextp->timeInc(5);
+  contextp->timeInc(1);
 }
 
 void reset(const std::unique_ptr<Vtop> &tb,
@@ -45,13 +40,18 @@ void reset(const std::unique_ptr<Vtop> &tb,
 inline void sendByte(const std::unique_ptr<Vtop> &tb,
                      const std::unique_ptr<VerilatedContext> &contextp,
                      uint8_t byte) {
+
+  VL_PRINTF("[%" PRId64 "] sending byte %x \n", contextp->time(), byte);
   tb->i_TX_Byte = byte;
   tb->i_TX_DV = 1;
   tick(tb, contextp);
   tb->i_TX_DV = 0;
-  while (tb->i_TX_DV != 1) {
+  while (tb->o_RX_DV != 1) {
     tick(tb, contextp);
   }
+  auto received_byte = tb->o_RX_Byte;
+  VL_PRINTF("[%" PRId64 "] received byte %x \n", contextp->time(),
+            received_byte);
 }
 
 int main(int argc, char **argv) {
@@ -96,13 +96,14 @@ int main(int argc, char **argv) {
   // Set Vtop's input signals
   top->i_reset_n = !0;
   top->i_clk = 0;
-  top->i_vga_r = 0x0;
-  top->i_vga_g = 0x0;
-  top->i_vga_b = 0x0;
+  top->i_TX_Byte = 0x0;
+  top->i_TX_DV = 0x0;
 
-  int seed = 0; // default seed value
+  int seed = 0;      // default seed value
+  int payload = 255; // default payload length
 
   static struct option long_options[] = {{"seed", required_argument, 0, 's'},
+                                         {"length", required_argument, 0, 'l'},
                                          {0, 0, 0, 0}};
 
   int option_index = 0;
@@ -113,15 +114,16 @@ int main(int argc, char **argv) {
     case 's':
       seed = std::atoi(optarg);
       break;
+    case 'l':
+      payload = std::atoi(optarg);
+      break;
     default: /* '?' */
       // Ignore other command line arguments
       break;
     }
   }
 
-  const uint64_t payload = 248;
-
-  uint8_t datastream[payload];
+  std::vector<uint8_t> datastream(payload);
 
   std::random_device rd;
 
@@ -129,27 +131,20 @@ int main(int argc, char **argv) {
 
   std::uniform_int_distribution<uint8_t> distribution(0, 255);
 
-  VL_PRINTF("Starting off with  seed %d", seed);
+  VL_PRINTF("Starting off with  seed %d, and payload of size %d \n", seed,
+            payload);
 
   for (int i = 0; i < payload; i++) {
-    payload[i] = distribution(gen);
-
+    datastream[i] = distribution(gen);
   }
 
   // Simulate for one screen render
   reset(top, contextp);
   auto prev_cycle_y = 0;
-  while (!contextp->gotFinish()) {
-
-    setColor(top, bitmap[top->o_y_addr][top->o_x_addr]);
-    tick(top, contextp);
-    // Read outputs
-    if (prev_cycle_y != top->o_y_addr) {
-      VL_PRINTF("[%" PRId64 "] x_addr=%d y_addr=%d\n", contextp->time(),
-                top->o_x_addr, top->o_y_addr);
-      prev_cycle_y = top->o_y_addr;
-    }
+  for (int j = 0; j < payload; j++) {
+    sendByte(top, contextp, datastream[j]);
   }
+
   // Final model cleanup
   top->final();
 // Coverage analysis (calling write only after the test is known to pass)

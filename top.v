@@ -4,8 +4,8 @@
 
 
 module top(
-    input i_Rst_L,
-    input i_Clk,
+    input i_reset_n,
+    input i_clk,
     input [7:0] i_TX_Byte,
     input i_TX_DV,
     output o_TX_Ready,
@@ -18,19 +18,10 @@ module top(
   parameter CLKS_PER_HALF_BIT = 4;  // 6.25 MHz
 
  
-
+  /* verilator lint_off UNUSEDSIGNAL */
   logic w_SPI_Clk;
   logic w_SPI_MOSI;
 
-  // Master Specific
-  
-  
-  
-  
-  
-
- 
-  
 
   // Instantiate UUT
   SPI_Master 
@@ -38,8 +29,8 @@ module top(
     .CLKS_PER_HALF_BIT(CLKS_PER_HALF_BIT)) SPI_Master_UUT
   (
    // Control/Data Signals,
-   .i_Rst_L(i_Rst_L),     // FPGA Reset
-   .i_Clk(i_Clk),         // FPGA Clock
+   .i_Rst_L(i_reset_n),     // FPGA Reset
+   .i_Clk(i_clk),         // FPGA Clock
    
    // TX (MOSI) Signals
    .i_TX_Byte(i_TX_Byte),     // Byte to transmit on MOSI

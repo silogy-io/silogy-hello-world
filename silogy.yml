@@ -3,9 +3,27 @@
 # A pipeline specifies which jobs ( = groups of tests) should be run at a certain time.
 version: 0
 test_rules:
-  test_tracing_rule:
-    command_string: test_default.sh
+  spi_test_rule:
+    command_string: >
+      test_spi.sh --
+      --seed={{ args['seed'] }}
+      --length={{ args['length'] }}
 test_targets:
-  test_tracing:
+  spi_test_default:
+    test_rule: spi_test_rule
     time_limit: 600
-    test_rule: test_tracing_rule
+    args:
+      seed: 0
+      length: 255
+  spi_test_seed_400:
+    test_rule: spi_test_rule
+    time_limit: 600
+    args:
+      seed: 256
+      length: 1024
+  spi_test_seed_34510:
+    test_rule: spi_test_rule
+    time_limit: 600
+    args:
+      seed: 256
+      length: 1024
