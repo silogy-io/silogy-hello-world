@@ -12,14 +12,14 @@ test_targets:
     test_rule: vga_test_rule
     time_limit: 600
     args:
-      seed: 400
+      seed: "400"
   vga_test_seed_400:
     test_rule: vga_test_rule
     time_limit: 600
     args:
-      seed: 400
+      seed: "400"
   vga_test_seed_34510:
     test_rule: vga_test_rule
     time_limit: 600
     args:
-      seed: 34510
+      seed: "34510"
