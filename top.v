@@ -1,46 +1,95 @@
-// DESCRIPTION: Verilator: Verilog example module
-//
-// This file ONLY is placed under the Creative Commons Public Domain, for
-// any use, without warranty, 2003 by Wilson Snyder.
-// SPDX-License-Identifier: CC0-1.0
-// ======================================================================
+///////////////////////////////////////////////////////////////////////////////
+// Description:       Simple test bench for SPI Master module
+///////////////////////////////////////////////////////////////////////////////
 
-// This is intended to be a complex example of several features, please also
-// see the simpler examples/make_hello_c.
 
-module top
+module top(
+    input i_Rst_L,
+    input i_Clk,
+    input [7:0] i_TX_Byte,
+    input i_TX_DV,
+    output o_TX_Ready,
+    output o_RX_DV,
+    output [7:0] o_RX_Byte
+
+  );
+  
+  parameter SPI_MODE = 3; // CPOL = 1, CPHA = 1
+  parameter CLKS_PER_HALF_BIT = 4;  // 6.25 MHz
+
+ 
+
+  logic w_SPI_Clk;
+  logic w_SPI_MOSI;
+
+  // Master Specific
+  
+  
+  
+  
+  
+
+ 
+  
+
+  // Instantiate UUT
+  SPI_Master 
+  #(.SPI_MODE(SPI_MODE),
+    .CLKS_PER_HALF_BIT(CLKS_PER_HALF_BIT)) SPI_Master_UUT
   (
-   // Declare some signals so we can see how I/O works
-   input              clk,
-   input              reset_l,
+   // Control/Data Signals,
+   .i_Rst_L(i_Rst_L),     // FPGA Reset
+   .i_Clk(i_Clk),         // FPGA Clock
+   
+   // TX (MOSI) Signals
+   .i_TX_Byte(i_TX_Byte),     // Byte to transmit on MOSI
+   .i_TX_DV(i_TX_DV),         // Data Valid Pulse with i_TX_Byte
+   .o_TX_Ready(o_TX_Ready),   // Transmit Ready for Byte
+   
+   // RX (MISO) Signals
+   .o_RX_DV(o_RX_DV),       // Data Valid pulse (1 clock cycle)
+   .o_RX_Byte(o_RX_Byte),   // Byte received on MISO
 
-   output wire [1:0]  out_small,
-   output wire [39:0] out_quad,
-   output wire [69:0] out_wide,
-   input [1:0]        in_small,
-   input [39:0]       in_quad,
-   input [69:0]       in_wide
+   // SPI Interface
+   .o_SPI_Clk(w_SPI_Clk),
+   .i_SPI_MISO(w_SPI_MOSI),
+   .o_SPI_MOSI(w_SPI_MOSI)
    );
 
-   // Connect up the outputs, using some trivial logic
-   assign out_small = ~reset_l ? '0 : (in_small + 2'b1);
-   assign out_quad  = ~reset_l ? '0 : (in_quad + 40'b1);
-   assign out_wide  = ~reset_l ? '0 : (in_wide + 70'b1);
 
-   // And an example sub module. The submodule will print stuff.
-   sub sub (/*AUTOINST*/
-            // Inputs
-            .clk                        (clk),
-            .reset_l                    (reset_l));
+  //// Sends a single byte from master.
+  //task SendSingleByte(input [7:0] data);
+  //  @(posedge r_Clk);
+  //  r_Master_TX_Byte <= data;
+  //  r_Master_TX_DV   <= 1'b1;
+  //  @(posedge r_Clk);
+  //  r_Master_TX_DV <= 1'b0;
+  //  @(posedge w_Master_TX_Ready);
+  //endtask // SendSingleByte
 
-   // Print some stuff as an example
-   initial begin
-      if ($test$plusargs("trace") != 0) begin
-         $display("[%0t] Tracing to logs/vlt_dump.vcd...\n", $time);
-         $dumpfile("logs/vlt_dump.vcd");
-         $dumpvars();
-      end
-      $display("[%0t] Model running...\n", $time);
-   end
+  //
+  //initial
+  //  begin
+  //    // Required for EDA Playground
+  //    $dumpfile("dump.vcd"); 
+  //    $dumpvars;
+  //    
+  //    repeat(10) @(posedge r_Clk);
+  //    r_Rst_L  = 1'b0;
+  //    repeat(10) @(posedge r_Clk);
+  //    r_Rst_L          = 1'b1;
+  //    
+  //    // Test single byte
+  //    SendSingleByte(8'hC1);
+  //    $display("Sent out 0xC1, Received 0x%X", r_Master_RX_Byte); 
+  //    
+  //    // Test double byte
+  //    SendSingleByte(8'hBE);
+  //    $display("Sent out 0xBE, Received 0x%X", r_Master_RX_Byte); 
+  //    SendSingleByte(8'hEF);
+  //    $display("Sent out 0xEF, Received 0x%X", r_Master_RX_Byte); 
+  //    repeat(10) @(posedge r_Clk);
+  //    $finish();      
+  //  end // initial begin
 
-endmodule
+endmodule // SPI_Slave
