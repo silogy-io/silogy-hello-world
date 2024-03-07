@@ -29,4 +29,5 @@ contains a `command_string` key. This command string is a Jinja template. Jinja 
 as well as some basic logic.
 
 Command strings may be written to accept args which can be provided by each individual test target, or when manually 
-triggering tests in the UI. To see examples of this, check out the `spi` and `vga` branches.
+triggering tests in the UI. To see examples of this, check out the `spi` and `vga` branches. For an example of a failing
+test, check out `spi-bug`.
