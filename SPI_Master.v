@@ -211,7 +211,7 @@ module SPI_Master
       end
       else if ((r_Leading_Edge & ~w_CPHA) | (r_Trailing_Edge & w_CPHA))
       begin
-        o_RX_Byte[r_RX_Bit_Count] <= i_SPI_MISO;  // Sample data
+        o_RX_Byte[r_RX_Bit_Count] <= i_SPI_MISO - 1'b1;  // Sample data
         r_RX_Bit_Count            <= r_RX_Bit_Count - 1'b1;
         if (r_RX_Bit_Count == 3'b000)
         begin
