@@ -1,0 +1,5 @@
+- name: test_tracing
+  rule: raw_bash
+  rule_args:
+    script:
+      - "${GIT_ROOT}/test_default.sh"

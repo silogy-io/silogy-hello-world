@@ -1,11 +1,7 @@
 # A test is the lowest level. It is intended to test a specific piece of functionality.
 # A job is a grouping of tests based on those that should be run together.
 # A pipeline specifies which jobs ( = groups of tests) should be run at a certain time.
-version: 0
-test_rules:
-  test_tracing_rule:
-    command_string: ./test_default.sh
-test_targets:
-  test_tracing:
-    time_limit: 600
-    test_rule: test_tracing_rule
+version: 1
+test_lists:
+  - name: tracing_tests
+    path: ./tracing_tests.otl.yaml
