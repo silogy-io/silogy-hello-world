@@ -3,5 +3,5 @@
 # A pipeline specifies which jobs ( = groups of tests) should be run at a certain time.
 version: 1
 test_lists:
-  - name: tracing_tests
+  - name: Test Tracing
     path: ./tracing_tests.otl.yaml
